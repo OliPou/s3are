@@ -97,7 +97,7 @@ func main() {
 	v1Router := router.Group("/v1")
 	v1Router.GET("/healthz", s3uploadfile.HandlerHealthz)
 	v1Router.POST("/uploadFileRequest", middleware.Auth(apiCfg.HandlerRequestUpload))
-	v1Router.PUT("/fileUploaded", middleware.Auth(apiCfg.HandlerRequestUploadComplete))
+	v1Router.PUT("/fileUploaded", middleware.Auth(apiCfg.HandlerRequestUploadCompleted))
 	v1Router.GET("/fileStatus", middleware.Auth(apiCfg.HandlerFileStatus))
 
 	// Start the server

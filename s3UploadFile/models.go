@@ -19,7 +19,7 @@ type UploadedFile struct {
 	UpdatedAT            time.Time `json:"updatedAt"`
 }
 
-func databaseUploadFileToUploadFile(dbUploadFile database.UploadedFile) UploadedFile {
+func DatabaseUploadFileToUploadFile(dbUploadFile database.UploadedFile) UploadedFile {
 	return UploadedFile{
 		TransactionUuid:      dbUploadFile.TransactionUuid,
 		Consumer:             dbUploadFile.Consumer,
@@ -33,7 +33,18 @@ func databaseUploadFileToUploadFile(dbUploadFile database.UploadedFile) Uploaded
 	}
 }
 
+type UploadsFileParams struct {
+	UserName      string `json:"userName"`
+	FileExtention string `json:"fileExtention"`
+}
+
 type GetUploadedFileParams struct {
 	TransactionUuid uuid.UUID `json:"transactionUuid" binding:"required"`
 	UserName        string    `json:"userName" binding:"required"`
+}
+
+type UploadCompletedParams struct {
+	TransactionUuid uuid.UUID `json:"transactionUuid" binding:"required"`
+	FileSize        int64     `json:"fileSize" binding:"required"`
+	FileType        string    `json:"fileType" binding:"required"`
 }
