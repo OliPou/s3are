@@ -1,6 +1,6 @@
 // internal/s3client/s3client.go
 
-package main
+package s3client
 
 import (
 	"time"
