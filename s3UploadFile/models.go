@@ -1,6 +1,7 @@
 package s3uploadfile
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/OliPou/s3are/internal/database"
@@ -8,15 +9,18 @@ import (
 )
 
 type UploadedFile struct {
-	TransactionUuid      uuid.UUID `json:"uuid"`
-	Consumer             string    `json:"consumer"`
-	UserName             string    `json:"userName"`
-	FileName             string    `json:"fileName"`
-	UploadPresignedUrl   string    `json:"uploadPresignedUrl"`
-	DownloadPresignedUrl string    `json:"downloadPresignedUrl"`
-	Status               string    `json:"status"`
-	CreatedAt            time.Time `json:"createdAt"`
-	UpdatedAT            time.Time `json:"updatedAt"`
+	TransactionUuid      uuid.UUID
+	Consumer             string
+	UserName             string
+	FileName             string
+	FileSize             sql.NullInt32
+	FileType             sql.NullString
+	UploadPresignedUrl   string
+	DownloadPresignedUrl string
+	Status               string
+	ContentType          string
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
 }
 
 func DatabaseUploadFileToUploadFile(dbUploadFile database.UploadedFile) UploadedFile {
@@ -25,11 +29,14 @@ func DatabaseUploadFileToUploadFile(dbUploadFile database.UploadedFile) Uploaded
 		Consumer:             dbUploadFile.Consumer,
 		UserName:             dbUploadFile.UserName,
 		FileName:             dbUploadFile.FileName,
+		FileSize:             dbUploadFile.FileSize,
+		FileType:             dbUploadFile.FileType,
 		UploadPresignedUrl:   dbUploadFile.UploadPresignedUrl,
 		DownloadPresignedUrl: dbUploadFile.DownloadPresignedUrl.String,
-		CreatedAt:            dbUploadFile.CreatedAt,
-		UpdatedAT:            dbUploadFile.UpdatedAt.Time,
 		Status:               dbUploadFile.Status,
+		ContentType:          dbUploadFile.ContentType,
+		CreatedAt:            dbUploadFile.CreatedAt,
+		UpdatedAt:            dbUploadFile.UpdatedAt.Time,
 	}
 }
 
@@ -44,7 +51,7 @@ type GetUploadedFileParams struct {
 }
 
 type UploadCompletedParams struct {
-	TransactionUuid uuid.UUID `json:"transactionUuid" binding:"required"`
-	FileSize        int64     `json:"fileSize" binding:"required"`
-	FileType        string    `json:"fileType" binding:"required"`
+	FileName string `json:"fileName" binding:"required"`
+	FileSize int64  `json:"fileSize" binding:"required"`
+	FileType string `json:"fileType" binding:"required"`
 }

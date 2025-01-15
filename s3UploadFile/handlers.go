@@ -6,18 +6,11 @@ import (
 
 	"github.com/OliPou/s3are/internal/common"
 	"github.com/OliPou/s3are/internal/database"
-	"github.com/OliPou/s3are/s3client"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
-type ApiConfig struct {
-	DB       *database.Queries
-	S3Client *s3client.S3Client
-}
-
-// Example usage:
 func HandlerHealthz(c *gin.Context) {
-	// Success response example
 	status := struct {
 		Status string `json:"status"`
 		Ready  string `json:"ready"`
@@ -33,12 +26,14 @@ func (apiCfg *ApiConfig) HandlerRequestUpload(c *gin.Context, consumer string) {
 	if err := common.ValidateRequest(c, &params); err != nil {
 		return
 	}
+
 	// Generate UUID first so we can use it in the filename
-	uploadInfo, err := UploadRequest(c, params, consumer, apiCfg)
+	uploadInfo, err := UploadRequest(c, params, consumer, apiCfg, uuid.New)
 	if err != nil {
 		common.RespondError(c, http.StatusInternalServerError, fmt.Sprintf("Error generating presigned URL: %v", err))
 		return
 	}
+
 	common.RespondWithJSON(c, http.StatusCreated, uploadInfo)
 }
 
@@ -74,5 +69,4 @@ func (apiCfg *ApiConfig) HandlerFileStatus(c *gin.Context, consumer string) {
 	}
 
 	common.RespondWithJSON(c, http.StatusOK, DatabaseUploadFileToUploadFile(uploadedFile))
-
 }

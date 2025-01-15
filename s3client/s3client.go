@@ -10,6 +10,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
+type S3ClientInterface interface {
+	GeneratePresignedURL(key, contentType string) (string, error)
+}
+
 type S3Client struct {
 	Client *s3.S3
 	Bucket string
@@ -31,6 +35,7 @@ func NewS3Client(region, bucket string) (*S3Client, error) {
 	}, nil
 }
 
+// Function to create Upload presigned Url on S3
 func (s *S3Client) GeneratePresignedURL(key, contentType string) (string, error) {
 	req, _ := s.Client.PutObjectRequest(&s3.PutObjectInput{
 		Bucket: aws.String(s.Bucket),
@@ -45,3 +50,20 @@ func (s *S3Client) GeneratePresignedURL(key, contentType string) (string, error)
 
 	return url, nil
 }
+
+// Function to create Download presigned Url on S3
+func (s *S3Client) GeneratePresignedDownloadURL(key string) (string, error) {
+	req, _ := s.Client.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String(s.Bucket),
+		Key:    aws.String(key),
+	})
+
+	url, err := req.Presign(24 * time.Hour)
+	if err != nil {
+		return "", err
+	}
+
+	return url, nil
+}
+
+var _ S3ClientInterface = (*S3Client)(nil) // Ensure S3Client implements S3ClientInterface
