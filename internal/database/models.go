@@ -21,7 +21,6 @@ type UploadedFile struct {
 	UploadPresignedUrl   string
 	DownloadPresignedUrl sql.NullString
 	Status               string
-	ContentType          string
 	CreatedAt            time.Time
 	UpdatedAt            sql.NullTime
 }

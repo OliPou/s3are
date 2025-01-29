@@ -18,7 +18,6 @@ type UploadedFile struct {
 	UploadPresignedUrl   string
 	DownloadPresignedUrl string
 	Status               string
-	ContentType          string
 	CreatedAt            time.Time
 	UpdatedAt            time.Time
 }
@@ -34,15 +33,15 @@ func DatabaseUploadFileToUploadFile(dbUploadFile database.UploadedFile) Uploaded
 		UploadPresignedUrl:   dbUploadFile.UploadPresignedUrl,
 		DownloadPresignedUrl: dbUploadFile.DownloadPresignedUrl.String,
 		Status:               dbUploadFile.Status,
-		ContentType:          dbUploadFile.ContentType,
 		CreatedAt:            dbUploadFile.CreatedAt,
 		UpdatedAt:            dbUploadFile.UpdatedAt.Time,
 	}
 }
 
 type UploadsFileParams struct {
-	UserName      string `json:"userName"`
-	FileExtention string `json:"fileExtention"`
+	UserName      string `json:"userName" binding:"required"`
+	FileName      string `json:"fileName" binding:"required"`
+	FileExtention string `json:"fileExtention" binding:"required"`
 }
 
 type GetUploadedFileParams struct {

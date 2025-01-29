@@ -36,7 +36,6 @@ func TestUploadRequest(t *testing.T) {
 				FileName:           "test-file.txt",
 				UploadPresignedUrl: "http://mock-presigned-url",
 				Status:             "Waiting file",
-				ContentType:        "application/octet-stream",
 				CreatedAt:          time.Now(),
 			}, nil
 		},
@@ -54,6 +53,7 @@ func TestUploadRequest(t *testing.T) {
 	// Test parameters
 	params := UploadsFileParams{
 		UserName:      "test-user",
+		FileName:      "test-file",
 		FileExtention: "txt",
 	}
 
@@ -134,7 +134,6 @@ func TestGetUploadedFile(t *testing.T) {
 				UserName:        "test-user",
 				FileName:        "test-file.txt",
 				Status:          "File Uploaded",
-				ContentType:     "application/octet-stream",
 				CreatedAt:       time.Now(),
 			}, nil
 		},

@@ -20,12 +20,11 @@ INSERT INTO uploaded_file (
     file_name,
     upload_presigned_url,
     status,
-    content_type,
     created_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, NOW()
+    $1, $2, $3, $4, $5, $6, NOW()
 )
-RETURNING transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, content_type, created_at, updated_at
+RETURNING transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, created_at, updated_at
 `
 
 type CreateUploadedFileParams struct {
@@ -35,7 +34,6 @@ type CreateUploadedFileParams struct {
 	FileName           string
 	UploadPresignedUrl string
 	Status             string
-	ContentType        string
 }
 
 func (q *Queries) CreateUploadedFile(ctx context.Context, arg CreateUploadedFileParams) (UploadedFile, error) {
@@ -46,7 +44,6 @@ func (q *Queries) CreateUploadedFile(ctx context.Context, arg CreateUploadedFile
 		arg.FileName,
 		arg.UploadPresignedUrl,
 		arg.Status,
-		arg.ContentType,
 	)
 	var i UploadedFile
 	err := row.Scan(
@@ -59,7 +56,6 @@ func (q *Queries) CreateUploadedFile(ctx context.Context, arg CreateUploadedFile
 		&i.UploadPresignedUrl,
 		&i.DownloadPresignedUrl,
 		&i.Status,
-		&i.ContentType,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -67,7 +63,7 @@ func (q *Queries) CreateUploadedFile(ctx context.Context, arg CreateUploadedFile
 }
 
 const getUploadedFile = `-- name: GetUploadedFile :one
-SELECT transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, content_type, created_at, updated_at FROM uploaded_file
+SELECT transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, created_at, updated_at FROM uploaded_file
 WHERE transaction_uuid = $1 and consumer = $2 and user_name = $3
 LIMIT 1
 `
@@ -91,7 +87,6 @@ func (q *Queries) GetUploadedFile(ctx context.Context, arg GetUploadedFileParams
 		&i.UploadPresignedUrl,
 		&i.DownloadPresignedUrl,
 		&i.Status,
-		&i.ContentType,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -107,7 +102,7 @@ SET
     status = $5,
     updated_at = NOW()
 WHERE transaction_uuid = $1
-RETURNING transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, content_type, created_at, updated_at
+RETURNING transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, created_at, updated_at
 `
 
 type UpdateUploadedFileParams struct {
@@ -137,7 +132,6 @@ func (q *Queries) UpdateUploadedFile(ctx context.Context, arg UpdateUploadedFile
 		&i.UploadPresignedUrl,
 		&i.DownloadPresignedUrl,
 		&i.Status,
-		&i.ContentType,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

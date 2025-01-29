@@ -9,7 +9,6 @@ CREATE TABLE uploaded_file(
     upload_presigned_url TEXT NOT NULL,
     download_presigned_url TEXT,
     status TEXT NOT NULL,
-    content_type TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP
 );

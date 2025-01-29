@@ -15,10 +15,11 @@ type UUIDGenerator func() uuid.UUID
 
 func UploadRequest(c *gin.Context, params UploadsFileParams, consumer string, apiCfg *ApiConfig, generateUUID UUIDGenerator) (UploadedFile, error) {
 	transactionUUID := generateUUID()
-	fileName := fmt.Sprintf("%s_%s_%s.%s",
+	fileName := fmt.Sprintf("%s_%s_%s_%s.%s",
 		transactionUUID.String(),
 		consumer,
 		params.UserName,
+		params.FileName,
 		params.FileExtention,
 	)
 	presignedURL, err := apiCfg.S3Client.GeneratePresignedURL(fileName, "application/octet-stream")
@@ -33,7 +34,6 @@ func UploadRequest(c *gin.Context, params UploadsFileParams, consumer string, ap
 		FileName:           fileName,
 		UploadPresignedUrl: presignedURL,
 		Status:             "Waiting file",
-		ContentType:        "application/octet-stream",
 	})
 	if err != nil {
 		log.Fatal("Error creating uploaded file:", err)
@@ -68,7 +68,7 @@ func UploadedCompleted(c *gin.Context, params UploadCompletedParams, apiCfg *Api
 	})
 	if err != nil {
 		fmt.Println("Error updating uploaded file:", err)
-		return UploadedFile{}, fmt.Errorf("Error updating uploaded file: %w", err)
+		return UploadedFile{}, fmt.Errorf("error updating uploaded file: %w", err)
 	}
 	return DatabaseUploadFileToUploadFile(uploadedFile), nil
 }

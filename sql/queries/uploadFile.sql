@@ -6,10 +6,9 @@ INSERT INTO uploaded_file (
     file_name,
     upload_presigned_url,
     status,
-    content_type,
     created_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, NOW()
+    $1, $2, $3, $4, $5, $6, NOW()
 )
 RETURNING *;
 
