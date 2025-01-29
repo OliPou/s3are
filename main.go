@@ -17,6 +17,8 @@ import (
 )
 
 func main() {
+	// Set Gin to release mode
+	gin.SetMode(gin.ReleaseMode)
 	// Load environment variables
 	if err := godotenv.Load(); err != nil {
 		fmt.Println("Error loading .env file:", err)
