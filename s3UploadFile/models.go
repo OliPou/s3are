@@ -44,11 +44,6 @@ type UploadsFileParams struct {
 	FileExtention string `json:"fileExtention" binding:"required"`
 }
 
-type GetUploadedFileParams struct {
-	TransactionUuid uuid.UUID `json:"transactionUuid" binding:"required"`
-	UserName        string    `json:"userName" binding:"required"`
-}
-
 type UploadCompletedParams struct {
 	FileName string `json:"fileName" binding:"required"`
 	FileSize int64  `json:"fileSize" binding:"required"`

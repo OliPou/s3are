@@ -52,15 +52,21 @@ func (apiCfg *ApiConfig) HandlerRequestUploadCompleted(c *gin.Context, consumer 
 }
 
 func (apiCfg *ApiConfig) HandlerFileStatus(c *gin.Context, consumer string) {
-	var params GetUploadedFileParams
-	if err := common.ValidateRequest(c, &params); err != nil {
+	transactionUuid, err := uuid.Parse(c.Query("transactionUuid"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid transactionUuid"})
 		return
 	}
-	fmt.Printf("getUploadedFileParams: %s, consumer: %s\n", params.TransactionUuid, consumer)
+	userName := c.Query("userName")
+	if userName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "userName is required"})
+		return
+	}
+	fmt.Printf("getUploadedFileParams: %s, consumer: %s\n", transactionUuid, consumer)
 	uploadedFile, err := apiCfg.DB.GetUploadedFile(c, database.GetUploadedFileParams{
-		TransactionUuid: params.TransactionUuid,
+		TransactionUuid: transactionUuid,
 		Consumer:        consumer,
-		UserName:        params.UserName,
+		UserName:        userName,
 	})
 
 	if err != nil {
