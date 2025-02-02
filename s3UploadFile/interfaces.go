@@ -2,6 +2,7 @@ package s3uploadfile
 
 import (
 	"context"
+	"time"
 
 	"github.com/OliPou/s3are/internal/database"
 )
@@ -13,6 +14,6 @@ type DBInterface interface {
 }
 
 type S3ClientInterface interface {
-	GeneratePresignedURL(key, contentType string) (string, error)
-	GeneratePresignedDownloadURL(key string) (string, error)
+	GeneratePresignedURL(key string, expirationTime *int) (string, time.Duration, error)
+	GeneratePresignedDownloadURL(key string, expirationTime *int) (string, time.Duration, error)
 }

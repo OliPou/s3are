@@ -19,21 +19,23 @@ INSERT INTO uploaded_file (
     user_name,
     file_name,
     upload_presigned_url,
+    upload_expiration_time,
     status,
     created_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, NOW()
+    $1, $2, $3, $4, $5, $6, $7, NOW()
 )
-RETURNING transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, created_at, updated_at
+RETURNING transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, created_at, updated_at, download_expiration_time, upload_expiration_time
 `
 
 type CreateUploadedFileParams struct {
-	TransactionUuid    uuid.UUID
-	Consumer           string
-	UserName           string
-	FileName           string
-	UploadPresignedUrl string
-	Status             string
+	TransactionUuid      uuid.UUID
+	Consumer             string
+	UserName             string
+	FileName             string
+	UploadPresignedUrl   string
+	UploadExpirationTime sql.NullTime
+	Status               string
 }
 
 func (q *Queries) CreateUploadedFile(ctx context.Context, arg CreateUploadedFileParams) (UploadedFile, error) {
@@ -43,6 +45,7 @@ func (q *Queries) CreateUploadedFile(ctx context.Context, arg CreateUploadedFile
 		arg.UserName,
 		arg.FileName,
 		arg.UploadPresignedUrl,
+		arg.UploadExpirationTime,
 		arg.Status,
 	)
 	var i UploadedFile
@@ -58,12 +61,14 @@ func (q *Queries) CreateUploadedFile(ctx context.Context, arg CreateUploadedFile
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DownloadExpirationTime,
+		&i.UploadExpirationTime,
 	)
 	return i, err
 }
 
 const getUploadedFile = `-- name: GetUploadedFile :one
-SELECT transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, created_at, updated_at FROM uploaded_file
+SELECT transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, created_at, updated_at, download_expiration_time, upload_expiration_time FROM uploaded_file
 WHERE transaction_uuid = $1 and consumer = $2 and user_name = $3
 LIMIT 1
 `
@@ -89,6 +94,8 @@ func (q *Queries) GetUploadedFile(ctx context.Context, arg GetUploadedFileParams
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DownloadExpirationTime,
+		&i.UploadExpirationTime,
 	)
 	return i, err
 }
@@ -100,17 +107,19 @@ SET
     file_type = $3,
     download_presigned_url = $4,
     status = $5,
-    updated_at = NOW()
+    updated_at = NOW(),
+    download_expiration_time = $6
 WHERE transaction_uuid = $1
-RETURNING transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, created_at, updated_at
+RETURNING transaction_uuid, consumer, user_name, file_name, file_size, file_type, upload_presigned_url, download_presigned_url, status, created_at, updated_at, download_expiration_time, upload_expiration_time
 `
 
 type UpdateUploadedFileParams struct {
-	TransactionUuid      uuid.UUID
-	FileSize             sql.NullInt32
-	FileType             sql.NullString
-	DownloadPresignedUrl sql.NullString
-	Status               string
+	TransactionUuid        uuid.UUID
+	FileSize               sql.NullInt32
+	FileType               sql.NullString
+	DownloadPresignedUrl   sql.NullString
+	Status                 string
+	DownloadExpirationTime sql.NullTime
 }
 
 func (q *Queries) UpdateUploadedFile(ctx context.Context, arg UpdateUploadedFileParams) (UploadedFile, error) {
@@ -120,6 +129,7 @@ func (q *Queries) UpdateUploadedFile(ctx context.Context, arg UpdateUploadedFile
 		arg.FileType,
 		arg.DownloadPresignedUrl,
 		arg.Status,
+		arg.DownloadExpirationTime,
 	)
 	var i UploadedFile
 	err := row.Scan(
@@ -134,6 +144,8 @@ func (q *Queries) UpdateUploadedFile(ctx context.Context, arg UpdateUploadedFile
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DownloadExpirationTime,
+		&i.UploadExpirationTime,
 	)
 	return i, err
 }

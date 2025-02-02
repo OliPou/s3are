@@ -11,13 +11,16 @@ import (
 )
 
 type S3ClientInterface interface {
-	GeneratePresignedURL(key, contentType string) (string, error)
+	GeneratePresignedURL(key string, expirationTime *int) (string, time.Duration, error)
+	GeneratePresignedDownloadURL(key string, expirationTime *int) (string, time.Duration, error)
 }
 
 type S3Client struct {
 	Client *s3.S3
 	Bucket string
 }
+
+const DefaultPresignedURLExpiration = 24 * time.Hour
 
 func NewS3Client(region, bucket string) (*S3Client, error) {
 	sess, err := session.NewSession(&aws.Config{
@@ -36,34 +39,51 @@ func NewS3Client(region, bucket string) (*S3Client, error) {
 }
 
 // Function to create Upload presigned Url on S3
-func (s *S3Client) GeneratePresignedURL(key, contentType string) (string, error) {
+func (s *S3Client) GeneratePresignedURL(key string, expirationTime *int) (string, time.Duration, error) {
 	req, _ := s.Client.PutObjectRequest(&s3.PutObjectInput{
 		Bucket: aws.String(s.Bucket),
 		Key:    aws.String(key),
 		// ContentType: aws.String(contentType),
 	})
-
-	url, err := req.Presign(24 * time.Hour)
-	if err != nil {
-		return "", err
+	// Use default duration if no expiration time is provided
+	duration := DefaultPresignedURLExpiration
+	if expirationTime != nil && *expirationTime > 0 {
+		duration = time.Duration(*expirationTime) * time.Second
+	}
+	maxDuration := 7 * 24 * time.Hour
+	if duration > maxDuration {
+		duration = maxDuration
 	}
 
-	return url, nil
+	url, err := req.Presign(duration)
+	if err != nil {
+		return "", time.Duration(0), err
+	}
+
+	return url, duration, nil
 }
 
 // Function to create Download presigned Url on S3
-func (s *S3Client) GeneratePresignedDownloadURL(key string) (string, error) {
+func (s *S3Client) GeneratePresignedDownloadURL(key string, expirationTime *int) (string, time.Duration, error) {
 	req, _ := s.Client.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(s.Bucket),
 		Key:    aws.String(key),
 	})
-
-	url, err := req.Presign(24 * time.Hour)
+	// Use default duration if no expiration time is provided
+	duration := DefaultPresignedURLExpiration
+	if expirationTime != nil && *expirationTime > 0 {
+		duration = time.Duration(*expirationTime) * time.Second
+	}
+	maxDuration := 7 * 24 * time.Hour
+	if duration > maxDuration {
+		duration = maxDuration
+	}
+	url, err := req.Presign(duration)
 	if err != nil {
-		return "", err
+		return "", time.Duration(0), err
 	}
 
-	return url, nil
+	return url, duration, nil
 }
 
 var _ S3ClientInterface = (*S3Client)(nil) // Ensure S3Client implements S3ClientInterface

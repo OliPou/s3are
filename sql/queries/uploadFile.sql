@@ -5,10 +5,11 @@ INSERT INTO uploaded_file (
     user_name,
     file_name,
     upload_presigned_url,
+    upload_expiration_time,
     status,
     created_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, NOW()
+    $1, $2, $3, $4, $5, $6, $7, NOW()
 )
 RETURNING *;
 
@@ -19,7 +20,8 @@ SET
     file_type = $3,
     download_presigned_url = $4,
     status = $5,
-    updated_at = NOW()
+    updated_at = NOW(),
+    download_expiration_time = $6
 WHERE transaction_uuid = $1
 RETURNING *;
 

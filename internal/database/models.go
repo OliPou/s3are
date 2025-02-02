@@ -12,15 +12,17 @@ import (
 )
 
 type UploadedFile struct {
-	TransactionUuid      uuid.UUID
-	Consumer             string
-	UserName             string
-	FileName             string
-	FileSize             sql.NullInt32
-	FileType             sql.NullString
-	UploadPresignedUrl   string
-	DownloadPresignedUrl sql.NullString
-	Status               string
-	CreatedAt            time.Time
-	UpdatedAt            sql.NullTime
+	TransactionUuid        uuid.UUID
+	Consumer               string
+	UserName               string
+	FileName               string
+	FileSize               sql.NullInt32
+	FileType               sql.NullString
+	UploadPresignedUrl     string
+	DownloadPresignedUrl   sql.NullString
+	Status                 string
+	CreatedAt              time.Time
+	UpdatedAt              sql.NullTime
+	DownloadExpirationTime sql.NullTime
+	UploadExpirationTime   sql.NullTime
 }

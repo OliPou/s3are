@@ -21,7 +21,7 @@ func TestUploadRequest(t *testing.T) {
 
 	// Setup mock S3 client
 	mockS3Client := &MockS3Client{
-		GeneratePresignedURLFunc: func(key, contentType string) (string, error) {
+		GeneratePresignedURLFunc: func(key string, expirationTime ...time.Duration) (string, error) {
 			return "http://mock-presigned-url", nil
 		},
 	}
@@ -75,7 +75,7 @@ func TestUploadedCompleted(t *testing.T) {
 	// Setup mock DB
 	// Setup mock S3 client
 	mockS3Client := &MockS3Client{
-		GeneratePresignedDownloadURLFunc: func(key string) (string, error) {
+		GeneratePresignedDownloadURLFunc: func(key string, expirationTime ...time.Duration) (string, error) {
 			return "http://mock-presigned-url", nil
 		},
 	}

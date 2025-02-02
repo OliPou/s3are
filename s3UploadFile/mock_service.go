@@ -2,22 +2,23 @@ package s3uploadfile
 
 import (
 	"context"
+	"time"
 
 	"github.com/OliPou/s3are/internal/database"
 )
 
 // Mock S3 Client
 type MockS3Client struct {
-	GeneratePresignedURLFunc         func(key, contentType string) (string, error)
-	GeneratePresignedDownloadURLFunc func(key string) (string, error)
+	GeneratePresignedURLFunc         func(key string, expirationTime *int) (string, time.Duration, error)
+	GeneratePresignedDownloadURLFunc func(key string, expirationTime *int) (string, time.Duration, error)
 }
 
-func (m *MockS3Client) GeneratePresignedURL(key, contentType string) (string, error) {
-	return m.GeneratePresignedURLFunc(key, contentType)
+func (m *MockS3Client) GeneratePresignedURL(key string, expirationTime *int) (string, time.Duration, error) {
+	return m.GeneratePresignedURLFunc(key, nil)
 }
 
-func (m *MockS3Client) GeneratePresignedDownloadURL(key string) (string, error) {
-	return m.GeneratePresignedDownloadURLFunc(key)
+func (m *MockS3Client) GeneratePresignedDownloadURL(key string, expirationTime *int) (string, time.Duration, error) {
+	return m.GeneratePresignedDownloadURLFunc(key, nil)
 }
 
 // Mock DB

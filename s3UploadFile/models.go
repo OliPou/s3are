@@ -20,6 +20,7 @@ type UploadedFile struct {
 	Status               string
 	CreatedAt            time.Time
 	UpdatedAt            time.Time
+	UploadExpirationTime time.Time
 }
 
 func DatabaseUploadFileToUploadFile(dbUploadFile database.UploadedFile) UploadedFile {
@@ -35,13 +36,15 @@ func DatabaseUploadFileToUploadFile(dbUploadFile database.UploadedFile) Uploaded
 		Status:               dbUploadFile.Status,
 		CreatedAt:            dbUploadFile.CreatedAt,
 		UpdatedAt:            dbUploadFile.UpdatedAt.Time,
+		UploadExpirationTime: dbUploadFile.UploadExpirationTime.Time,
 	}
 }
 
 type UploadsFileParams struct {
-	UserName      string `json:"userName" binding:"required"`
-	FileName      string `json:"fileName" binding:"required"`
-	FileExtention string `json:"fileExtention" binding:"required"`
+	UserName               string `json:"userName" binding:"required"`
+	FileName               string `json:"fileName" binding:"required"`
+	FileExtention          string `json:"fileExtention" binding:"required"`
+	LinkExpirationDuration *int   `json:"linkExpirationDuration,omitempty"`
 }
 
 type UploadCompletedParams struct {
