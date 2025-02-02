@@ -135,10 +135,10 @@ func checkDatabase(db *sql.DB) error {
 func handlerHealthz(c *gin.Context) {
 	status := struct {
 		Status string `json:"status"`
-		Ready  string `json:"ready"`
+		Ready  bool   `json:"ready"`
 	}{
-		Status: "Ok",
-		Ready:  "true",
+		Status: "ok",
+		Ready:  true,
 	}
 	common.RespondWithJSON(c, http.StatusOK, status)
 }
