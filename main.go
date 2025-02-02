@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
+	"github.com/OliPou/s3are/internal/common"
 	"github.com/OliPou/s3are/internal/database"
 	"github.com/OliPou/s3are/middleware"
 	s3uploadfile "github.com/OliPou/s3are/s3UploadFile"
@@ -31,6 +33,8 @@ func main() {
 	if portString == "" {
 		portString = "8080"
 	}
+
+	var ginRouterGroupName string = os.Getenv("GIN_ROUTER_GROUP_NAME")
 
 	dbUrl := os.Getenv("DB_URL")
 
@@ -101,8 +105,9 @@ func main() {
 	// 		"message": "pong",
 	// 	})
 	// })
-	v1Router := router.Group("/v1")
-	v1Router.GET("/healthz", s3uploadfile.HandlerHealthz)
+
+	v1Router := router.Group(fmt.Sprintf("/%s", ginRouterGroupName))
+	v1Router.GET("/healthz", handlerHealthz)
 	v1Router.POST("/uploadFileRequest", middleware.Auth(apiCfg.HandlerRequestUpload))
 	v1Router.PUT("/fileUploaded", middleware.Auth(apiCfg.HandlerRequestUploadCompleted))
 	v1Router.GET("/fileStatus", middleware.Auth(apiCfg.HandlerFileStatus))
@@ -125,4 +130,15 @@ func checkDatabase(db *sql.DB) error {
 		time.Sleep(2 * time.Second)
 	}
 	return fmt.Errorf("database is not ready")
+}
+
+func handlerHealthz(c *gin.Context) {
+	status := struct {
+		Status string `json:"status"`
+		Ready  string `json:"ready"`
+	}{
+		Status: "Ok",
+		Ready:  "true",
+	}
+	common.RespondWithJSON(c, http.StatusOK, status)
 }

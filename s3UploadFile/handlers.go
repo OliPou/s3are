@@ -10,17 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-func HandlerHealthz(c *gin.Context) {
-	status := struct {
-		Status string `json:"status"`
-		Ready  string `json:"ready"`
-	}{
-		Status: "Ok",
-		Ready:  "true",
-	}
-	common.RespondWithJSON(c, http.StatusOK, status)
-}
-
 func (apiCfg *ApiConfig) HandlerRequestUpload(c *gin.Context, consumer string) {
 	var params UploadsFileParams
 	if err := common.ValidateRequest(c, &params); err != nil {
