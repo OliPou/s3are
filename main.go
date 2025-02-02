@@ -108,9 +108,9 @@ func main() {
 
 	v1Router := router.Group(fmt.Sprintf("/%s", ginRouterGroupName))
 	v1Router.GET("/healthz", handlerHealthz)
-	v1Router.POST("/uploadFileRequest", middleware.Auth(apiCfg.HandlerRequestUpload))
-	v1Router.PUT("/fileUploaded", middleware.Auth(apiCfg.HandlerRequestUploadCompleted))
-	v1Router.GET("/fileStatus", middleware.Auth(apiCfg.HandlerFileStatus))
+	v1Router.POST("/upload-file-request", middleware.Auth(apiCfg.HandlerRequestUpload))
+	v1Router.PUT("/file-uploaded", middleware.Auth(apiCfg.HandlerRequestUploadCompleted))
+	v1Router.GET("/file-status", middleware.Auth(apiCfg.HandlerFileStatus))
 
 	// Start the server
 	if err := router.Run(":" + portString); err != nil {
