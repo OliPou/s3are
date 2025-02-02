@@ -3,7 +3,6 @@ package s3uploadfile
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/OliPou/s3are/internal/database"
@@ -24,8 +23,8 @@ func UploadRequest(c *gin.Context, params UploadsFileParams, consumer string, ap
 	)
 	presignedURL, err := apiCfg.S3Client.GeneratePresignedURL(fileName, "application/octet-stream")
 	if err != nil {
-		log.Fatal("Error generating presigned URL:", err)
-		return UploadedFile{}, fmt.Errorf("Error generating presigned URL")
+		fmt.Printf("error generating presigned URL: %v", err)
+		return UploadedFile{}, fmt.Errorf("error generating presigned URL")
 	}
 	uploadedFile, err := apiCfg.DB.CreateUploadedFile(c, database.CreateUploadedFileParams{
 		TransactionUuid:    transactionUUID,
@@ -36,8 +35,8 @@ func UploadRequest(c *gin.Context, params UploadsFileParams, consumer string, ap
 		Status:             "Waiting file",
 	})
 	if err != nil {
-		log.Fatal("Error creating uploaded file:", err)
-		return UploadedFile{}, fmt.Errorf("Error creating uploaded file: %w", err)
+		fmt.Printf("Error creating uploaded file: %v", err)
+		return UploadedFile{}, fmt.Errorf("error creating uploaded file")
 	}
 	return DatabaseUploadFileToUploadFile(uploadedFile), nil
 }
@@ -48,7 +47,8 @@ func UploadedCompleted(c *gin.Context, params UploadCompletedParams, apiCfg *Api
 	uuidStr := inputFileName[0]
 	transactionUuid, err := uuid.Parse(uuidStr)
 	if err != nil {
-		log.Fatalf("Failed to parse UUID: %v", err)
+		fmt.Printf("Error updating uploaded file: %v", err)
+		return UploadedFile{}, fmt.Errorf("error updating uploaded file")
 	}
 	uploadedFile, err := apiCfg.DB.UpdateUploadedFile(c, database.UpdateUploadedFileParams{
 		TransactionUuid: transactionUuid,
